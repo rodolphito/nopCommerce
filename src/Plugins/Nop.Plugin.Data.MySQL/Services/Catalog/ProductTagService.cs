@@ -61,7 +61,7 @@ namespace Nop.Plugin.Data.MySQL.Services.Catalog
         /// </summary>
         /// <param name="storeId">Store identifier</param>
         /// <returns>Dictionary of "product tag ID : product count"</returns>
-        protected override Dictionary<int, int> GetProductCount(int storeId)
+        protected override Dictionary<int, int> GetProductCount(int productTagId, int storeId, bool showHidden = false)
         {
             var key = string.Format(NopCatalogDefaults.ProductTagCountCacheKey, storeId);
             return _staticCacheManager.Get(key, () =>
