@@ -270,7 +270,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
         public static IMvcBuilder AddNopMvc(this IServiceCollection services)
         {
             //add basic MVC feature
-            var mvcBuilder = services.AddMvc();
+            var mvcBuilder = services.AddMvc().AddControllersAsServices();
 
             //we use legacy (from previous versions) routing logic
             mvcBuilder.AddMvcOptions(options => options.EnableEndpointRouting = false);
