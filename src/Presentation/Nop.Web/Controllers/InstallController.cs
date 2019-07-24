@@ -277,21 +277,6 @@ namespace Nop.Web.Controllers
             //If the application is impersonating via <identity impersonate="true"/>, 
             //the identity will be the anonymous user (typically IUSR_MACHINENAME) or the authenticated request user.
             var webHelper = EngineContext.Current.Resolve<IWebHelper>();
-            //validate permissions
-            var dirsToCheck = FilePermissionHelper.GetDirectoriesWrite();
-            foreach (var dir in dirsToCheck)
-                if (!FilePermissionHelper.CheckPermissions(dir, false, true, true, false))
-                    ModelState.AddModelError(string.Empty, string.Format(_locService.GetResource("ConfigureDirectoryPermissions"), CurrentOSUser.FullName, dir));
-
-            var filesToCheck = FilePermissionHelper.GetFilesWrite();
-            foreach (var file in filesToCheck)
-            {
-                if (!_fileProvider.FileExists(file))
-                    continue;
-
-                if (!FilePermissionHelper.CheckPermissions(file, false, true, true, true))
-                    ModelState.AddModelError(string.Empty, string.Format(_locService.GetResource("ConfigureFilePermissions"), CurrentOSUser.FullName, file));
-            }
 
             if (!ModelState.IsValid) 
                 return View(model);
