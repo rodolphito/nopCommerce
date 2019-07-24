@@ -749,7 +749,7 @@ namespace Nop.Web.Areas.Admin.Factories
             PreparePerformanceSettingsWarningModel(models);
 
             //validate write permissions (the same procedure like during installation)
-            PrepareFilePermissionsWarningModel(models);
+            //PrepareFilePermissionsWarningModel(models);
 
             //not active plugins
             PreparePluginsEnabledWarningModel(models);
