@@ -15,6 +15,7 @@
     <title>@ILS.GetResource("Title")</title>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <link rel="shortcut icon" href="/icons/icons_0/favicon.ico">
     @if (ILS.GetCurrentLanguage().IsRightToLeft)
     {
         <link href="@Url.Content("~/lib/bootstrap/css/bootstrap.rtl.css")" type="text/css" rel="stylesheet" />
@@ -90,7 +91,7 @@
         sqlConnectionInfo = $('#sqlConnectionInfo').html();
         mysqlConnectionInfo = $('#mysqlConnectionInfo').html();
 
-        $('input:radio[name=DataProvider]').on('click', toggleProvider);
+        $('input:radio[name=DataProvider]').click(toggleProvider);
         BindToggles();
 
         toggleProvider();
@@ -100,20 +101,19 @@
     });
 
     function BindToggles() {
-        $('input:radio[name=SqlConnectionInfo]').on('click', toggleSqlConnectionInfo);
-        $('input:radio[name=SqlAuthenticationType]').on('click', toggleSqlAuthenticationType);
-        $("input:checkbox[name=UseCustomCollation]").on('click', toggleCollation);
+        $('input:radio[name=SqlConnectionInfo]').click(toggleSqlConnectionInfo);
+        $('input:radio[name=SqlAuthenticationType]').click(toggleSqlAuthenticationType);
+        $("input:checkbox[name=UseCustomCollation]").click(toggleCollation);
     }
 
     function toggleProvider() {
         var selectedProvider = $("input[name=DataProvider]:checked").attr('id');
-        if (selectedProvider == 'provider_sqlserver') {
-            $('#mysqlConnectionInfo').html('');
-            $('#sqlConnectionInfo').html(sqlConnectionInfo);
-        } else if (selectedProvider == 'provider_mysql') {
-            $('#sqlConnectionInfo').html('');
-            $('#mysqlConnectionInfo').html(mysqlConnectionInfo);
-            $('#mysqlauthenticationtype_sql').prop('checked', 'true');
+        if (selectedProvider == 'provider_mysql') {
+            $('#sqlConnectionInfo').hide();
+            $('#mysqlConnectionInfo').show();
+        } else if (selectedProvider == 'provider_sqlserver') {
+            $('#sqlConnectionInfo').show();
+            $('#mysqlConnectionInfo').hide();
         }
         BindToggles();
     }
@@ -341,7 +341,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group" id="sqlDatabaseConnectionString" hidden>
+                                <div class="form-group" id="sqlDatabaseConnectionString">
                                     <div class="col-xs-4">
                                         <label class="control-label">
                                             @ILS.GetResource("ConnectionString")
