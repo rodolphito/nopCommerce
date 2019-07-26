@@ -168,7 +168,7 @@ namespace Nop.Plugin.Data.MySQL.Controllers
         public override IActionResult Index()
         {
             if (DataSettingsManager.DatabaseIsInstalled)
-                return RedirectToRoute("HomePage");
+                return RedirectToRoute("Homepage");
 
             var model = new InstallModel
             {
@@ -202,7 +202,7 @@ namespace Nop.Plugin.Data.MySQL.Controllers
         public override IActionResult Index(InstallModel model)
         {
             if (DataSettingsManager.DatabaseIsInstalled)
-                return RedirectToRoute("HomePage");
+                return RedirectToRoute("Homepage");
 
             if (model.DatabaseConnectionString != null)
                 model.DatabaseConnectionString = model.DatabaseConnectionString.Trim();
@@ -322,31 +322,33 @@ namespace Nop.Plugin.Data.MySQL.Controllers
 
                     //now resolve installation service
                     var installationService = EngineContext.Current.Resolve<IInstallationService>();
-                    installationService.InstallData(model.AdminEmail, model.AdminPassword, model.InstallSampleData);
+                    installationService.InstallRequiredData(model.AdminEmail, model.AdminPassword);
+
+                    if (model.InstallSampleData)
+                        installationService.InstallSampleData(model.AdminEmail);
 
                     //reset cache
                     DataSettingsManager.ResetCache();
 
-                    //install plugins
-                    PluginManager.MarkAllPluginsAsUninstalled();
-                    var pluginFinder = EngineContext.Current.Resolve<IPluginFinder>();
-                    var plugins = pluginFinder.GetPlugins<IPlugin>(LoadPluginsMode.All)
-                        .ToList()
-                        .OrderBy(x => x.PluginDescriptor.Group)
-                        .ThenBy(x => x.PluginDescriptor.DisplayOrder)
+                    //prepare plugins to install
+                    var pluginService = EngineContext.Current.Resolve<IPluginService>();
+                    pluginService.ClearInstalledPluginsList();
+
+                    var pluginsIgnoredDuringInstallation = new List<string>();
+                    if (!string.IsNullOrEmpty(_config.PluginsIgnoredDuringInstallation))
+                    {
+                        pluginsIgnoredDuringInstallation = _config.PluginsIgnoredDuringInstallation
+                            .Split(',', StringSplitOptions.RemoveEmptyEntries).Select(pluginName => pluginName.Trim()).ToList();
+                    }
+
+                    var plugins = pluginService.GetPluginDescriptors<IPlugin>(LoadPluginsMode.All)
+                        .Where(pluginDescriptor => !pluginsIgnoredDuringInstallation.Contains(pluginDescriptor.SystemName))
+                        .OrderBy(pluginDescriptor => pluginDescriptor.Group).ThenBy(pluginDescriptor => pluginDescriptor.DisplayOrder)
                         .ToList();
-                    var pluginsIgnoredDuringInstallation = string.IsNullOrEmpty(_config.PluginsIgnoredDuringInstallation) ?
-                        new List<string>() :
-                        _config.PluginsIgnoredDuringInstallation
-                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(x => x.Trim())
-                        .ToList();
+
                     foreach (var plugin in plugins)
                     {
-                        if (pluginsIgnoredDuringInstallation.Contains(plugin.PluginDescriptor.SystemName))
-                            continue;
-
-                        plugin.Install();
+                        pluginService.PreparePluginToInstall(plugin.SystemName, checkDependencies: false);
                     }
 
                     //register default permissions
@@ -362,7 +364,7 @@ namespace Nop.Plugin.Data.MySQL.Controllers
                     webHelper.RestartAppDomain();
 
                     //Redirect to home page
-                    return RedirectToRoute("HomePage");
+                    return RedirectToRoute("Homepage");
                 }
                 catch (Exception exception)
                 {

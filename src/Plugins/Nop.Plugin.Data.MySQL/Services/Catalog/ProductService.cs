@@ -55,6 +55,7 @@ namespace Nop.Plugin.Data.MySQL.Services.Catalog
             IRepository<StockQuantityHistory> stockQuantityHistoryRepository,
             IRepository<StoreMapping> storeMappingRepository,
             IRepository<TierPrice> tierPriceRepository,
+            IStoreService storeService,
             IStoreMappingService storeMappingService,
             IWorkContext workContext,
             LocalizationSettings localizationSettings)
@@ -80,6 +81,7 @@ namespace Nop.Plugin.Data.MySQL.Services.Catalog
                 stockQuantityHistoryRepository,
                 storeMappingRepository,
                 tierPriceRepository,
+                storeService,
                 storeMappingService,
                 workContext,
                 localizationSettings)
@@ -177,7 +179,7 @@ namespace Nop.Plugin.Data.MySQL.Services.Catalog
             var query = new StringBuilder();
             query.AppendLine(@"
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED ;
-SELECT p.* 
+SELECT p.*
 FROM Product p");
 
             var filter = new StringBuilder();
@@ -214,7 +216,7 @@ FROM Product p");
 
             if (warehouseId > 0)
             {
-                filter.AppendLine($@"AND  
+                filter.AppendLine($@"AND
 			    (
 				    (p.UseMultipleWarehouses = 0 AND p.WarehouseId = {warehouseId})
 				    OR
@@ -251,11 +253,11 @@ FROM Product p");
 
             if (!_catalogSettings.IgnoreAcl && !showHidden && allowedCustomerRolesIds != null && allowedCustomerRolesIds.Any())
             {
-                filter.AppendLine($@"AND (p.SubjectToAcl = 0 OR 
+                filter.AppendLine($@"AND (p.SubjectToAcl = 0 OR
                     EXISTS (
 			            SELECT 1
 					    FROM AclRecord acl
-					    WHERE acl.EntityId = p.Id AND acl.EntityName = 'Product' 
+					    WHERE acl.EntityId = p.Id AND acl.EntityName = 'Product'
                             AND acl.CustomerRoleId IN ({commaSeparatedAllowedCustomerRoleIds})
 			        ))");
             }
@@ -311,7 +313,7 @@ FROM Product p");
             //return products
             return new PagedList<Product>(products, pageIndex, pageSize, totalRecords);
         }
-        
+
         #endregion
     }
 }

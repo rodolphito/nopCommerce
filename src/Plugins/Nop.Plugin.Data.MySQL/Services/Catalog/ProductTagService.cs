@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Data;
+using Nop.Core.Data.Extensions;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Stores;
+using Nop.Core.Domain.Customers;
 using Nop.Data;
 using Nop.Services.Catalog;
 using Nop.Services.Events;
@@ -26,7 +30,9 @@ namespace Nop.Plugin.Data.MySQL.Services.Catalog
 
         #region Ctor
 
-        public ProductTagService(ICacheManager cacheManager,
+        public ProductTagService(CatalogSettings catalogSettings,
+            ICacheManager cacheManager,
+            IDataProvider dataProvider,
             IDbContext dbContext,
             IEventPublisher eventPublisher,
             IProductService productService,
@@ -34,16 +40,20 @@ namespace Nop.Plugin.Data.MySQL.Services.Catalog
             IRepository<ProductTag> productTagRepository,
             IStaticCacheManager staticCacheManager,
             IUrlRecordService urlRecordService,
+            IWorkContext workContext,
             IRepository<Product> productRepository,
             IRepository<StoreMapping> storeMappingRepository)
-            : base(cacheManager,
+            : base(catalogSettings,
+                cacheManager,
+                dataProvider,
                 dbContext,
                 eventPublisher,
                 productService,
                 productProductTagMappingRepository,
                 productTagRepository,
                 staticCacheManager,
-                urlRecordService)
+                urlRecordService,
+                workContext)
         {
             _productProductTagMappingRepository = productProductTagMappingRepository;
             _productTagRepository = productTagRepository;

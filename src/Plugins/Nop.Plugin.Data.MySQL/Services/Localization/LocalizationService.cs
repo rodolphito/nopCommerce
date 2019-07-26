@@ -101,7 +101,7 @@ namespace Nop.Plugin.Data.MySQL.Services.Localization
             _lsrRepository.Insert(resources);
 
             //clear cache
-            _cacheManager.RemoveByPattern(NopLocalizationDefaults.LocaleStringResourcesPatternCacheKey);
+            _cacheManager.RemoveByPrefix(NopLocalizationDefaults.LocaleStringResourcesPrefixCacheKey);
         }
 
         #endregion
