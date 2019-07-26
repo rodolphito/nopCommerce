@@ -10,7 +10,6 @@ using Nop.Core.Caching;
 using Nop.Core.Configuration;
 using Nop.Core.Data;
 using Nop.Core.Infrastructure;
-using Nop.Core.Plugins;
 using Nop.Services.Installation;
 using Nop.Services.Plugins;
 using Nop.Services.Security;
@@ -35,8 +34,8 @@ namespace Nop.Plugin.Data.MySQL.Controllers
         public InstallWithMySQLController(IInstallationLocalizationService locService,
             INopFileProvider fileProvider,
             NopConfig config)
-            : base(locService, 
-                fileProvider, 
+            : base(locService,
+                fileProvider,
                 config)
         {
             _locService = locService;
@@ -76,8 +75,8 @@ namespace Nop.Plugin.Data.MySQL.Controllers
         /// <param name="connectionString">Connection string</param>
         /// <param name="collation">Server collation; the default one will be used if not specified</param>
         /// <param name="triesToConnect">
-        /// Number of times to try to connect to database. 
-        /// If connection cannot be open, then error will be returned. 
+        /// Number of times to try to connect to database.
+        /// If connection cannot be open, then error will be returned.
         /// Pass 0 to skip this validation.
         /// </param>
         /// <returns>Error</returns>
@@ -263,14 +262,14 @@ namespace Nop.Plugin.Data.MySQL.Controllers
                 }
             }
 
-            //Consider granting access rights to the resource to the ASP.NET request identity. 
-            //ASP.NET has a base process identity 
-            //(typically {MACHINE}\ASPNET on IIS 5 or Network Service on IIS 6 and IIS 7, 
+            //Consider granting access rights to the resource to the ASP.NET request identity.
+            //ASP.NET has a base process identity
+            //(typically {MACHINE}\ASPNET on IIS 5 or Network Service on IIS 6 and IIS 7,
             //and the configured application pool identity on IIS 7.5) that is used if the application is not impersonating.
-            //If the application is impersonating via <identity impersonate="true"/>, 
+            //If the application is impersonating via <identity impersonate="true"/>,
             //the identity will be the anonymous user (typically IUSR_MACHINENAME) or the authenticated request user.
             var webHelper = EngineContext.Current.Resolve<IWebHelper>();
-            
+
             if (ModelState.IsValid)
             {
                 try

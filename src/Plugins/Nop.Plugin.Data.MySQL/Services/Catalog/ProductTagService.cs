@@ -61,10 +61,10 @@ namespace Nop.Plugin.Data.MySQL.Services.Catalog
         /// </summary>
         /// <param name="storeId">Store identifier</param>
         /// <returns>Dictionary of "product tag ID : product count"</returns>
-        protected override Dictionary<int, int> GetProductCount(int productTagId, int storeId, bool showHidden = false)
+        public override int GetProductCount(int productTagId, int storeId, bool showHidden = false)
         {
             var key = string.Format(NopCatalogDefaults.ProductTagCountCacheKey, storeId);
-            return _staticCacheManager.Get(key, () =>
+            Dictionary<int, int> dictionary = _staticCacheManager.Get(key, () =>
             {
                 return (from pt in _productTagRepository.Table
                         join ptm in _productProductTagMappingRepository.Table on pt.Id equals ptm.ProductTagId
@@ -77,6 +77,10 @@ namespace Nop.Plugin.Data.MySQL.Services.Catalog
                     .AsNoTracking().ToList()
                     .ToDictionary(item => item.Key, item => item.Count());
             });
+            if (dictionary.ContainsKey(productTagId))
+                return dictionary[productTagId];
+
+            return 0;
         }
 
         #endregion

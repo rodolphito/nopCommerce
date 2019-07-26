@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
@@ -62,19 +63,19 @@ namespace Nop.Plugin.Data.MySQL.Services.Localization
         /// <param name="language">Language</param>
         /// <param name="xml">XML</param>
         /// <param name="updateExistingResources">A value indicating whether to update existing resources</param>
-        public override void ImportResourcesFromXml(Language language, string xml, bool updateExistingResources = true)
+        public override void ImportResourcesFromXml(Language language, StreamReader xmlStreamReader, bool updateExistingResources = true)
         {
             if (language == null)
                 throw new ArgumentNullException(nameof(language));
 
-            if (string.IsNullOrEmpty(xml))
+            if (xmlStreamReader.EndOfStream)
                 return;
 
             //SQL 2005 insists that your XML schema encoding be in UTF-16.
             //Otherwise, you'll get "XML parsing: line 1, character XXX, unable to switch the encoding"
             //so let's remove XML declaration
             var inDoc = new XmlDocument();
-            inDoc.LoadXml(xml);
+            inDoc.Load(xmlStreamReader);
             var sb = new StringBuilder();
             using (var xWriter = XmlWriter.Create(sb, new XmlWriterSettings { OmitXmlDeclaration = true }))
             {
